@@ -29,6 +29,20 @@ class ToolScoutTests(unittest.TestCase):
         self.assertIn("claude code", joined)
         self.assertLessEqual(len(plan.queries), 12)
 
+    def test_target_product_helper_needs_native_feature_audit(self):
+        plan = tool_scout.build_query_plan(
+            "Codex Desktop helper for selected text comments and side chat questions"
+        )
+        joined = " ".join(plan.native_audit_queries).lower()
+        self.assertTrue(plan.native_audit_queries)
+        self.assertIn("codex desktop", joined)
+        self.assertIn("selected text", joined)
+        self.assertIn("context menu", joined)
+
+    def test_general_tool_search_does_not_force_native_feature_audit(self):
+        plan = tool_scout.build_query_plan("MCP server for browser automation")
+        self.assertEqual(plan.native_audit_queries, [])
+
     def test_dedupe_merges_same_url(self):
         candidates = [
             tool_scout.Candidate(

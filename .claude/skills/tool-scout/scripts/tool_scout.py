@@ -75,6 +75,31 @@ SOURCE_LABELS = {
     "pulsemcp": "MCP server",
 }
 
+NATIVE_FEATURE_CHECKLIST = (
+    "official documentation and help center",
+    "current product UI: selected text, right-click/context menu, hover menu, toolbar",
+    "command palette, slash commands, and keyboard shortcuts",
+    "extension/plugin/API support and built-in integrations",
+    "release notes and changelog for recently shipped native features",
+)
+
+PRODUCT_PATTERNS = (
+    ("codex desktop", "Codex Desktop"),
+    ("codex app", "Codex Desktop"),
+    ("codex cli", "Codex CLI"),
+    ("openai codex", "OpenAI Codex"),
+    ("chatgpt desktop", "ChatGPT Desktop"),
+    ("chatgpt", "ChatGPT"),
+    ("claude code", "Claude Code"),
+    ("claude desktop", "Claude Desktop"),
+    ("cursor", "Cursor"),
+    ("vscode", "VS Code"),
+    ("vs code", "VS Code"),
+    ("raycast", "Raycast"),
+    ("feishu", "Feishu/Lark"),
+    ("lark", "Feishu/Lark"),
+)
+
 
 @dataclass
 class NeedProfile:
@@ -91,6 +116,7 @@ class QueryPlan:
     raw: str
     profile: NeedProfile
     queries: list[str]
+    native_audit_queries: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -254,8 +280,106 @@ def build_need_profile(raw: str) -> NeedProfile:
     )
 
 
+def detect_target_products(raw: str) -> list[str]:
+    normalized = normalize_text(raw)
+    products: list[str] = []
+    for pattern, product in PRODUCT_PATTERNS:
+        if pattern in normalized:
+            products.append(product)
+    if "codex" in normalized and "桌面" in raw:
+        products.append("Codex Desktop")
+    if "chatgpt" in normalized and "桌面" in raw:
+        products.append("ChatGPT Desktop")
+    return unique_keep_order(products, 3)
+
+
+def needs_native_feature_audit(raw: str) -> bool:
+    normalized = normalize_text(raw)
+    product_signals = bool(detect_target_products(raw))
+    helper_signals = any(
+        signal in normalized
+        for signal in (
+            "extension",
+            "plugin",
+            "overlay",
+            "desktop",
+            "cli",
+            "integration",
+            "helper",
+            "assistant",
+            "workflow",
+            "automation",
+            "right click",
+            "context menu",
+            "keyboard shortcut",
+            "shortcut",
+            "command palette",
+            "selected text",
+            "selection",
+            "native",
+            "built in",
+            "built-in",
+        )
+    ) or any(
+        signal in raw
+        for signal in (
+            "插件",
+            "扩展",
+            "桌面",
+            "命令",
+            "命令行",
+            "集成",
+            "辅助",
+            "自动化",
+            "控制",
+            "桥接",
+            "右键",
+            "菜单",
+            "快捷键",
+            "命令面板",
+            "选中",
+            "划线",
+            "原生",
+            "内置",
+        )
+    )
+    return product_signals and helper_signals
+
+
+def build_native_audit_queries(raw: str, max_queries: int = 6) -> list[str]:
+    if not needs_native_feature_audit(raw):
+        return []
+
+    products = detect_target_products(raw)
+    if not products:
+        return []
+
+    capability = normalize_text(raw)
+    capability = re.sub(
+        r"\b(find|tool|software|extension|plugin|helper|assistant|for|to|that|can|with)\b",
+        " ",
+        capability,
+    )
+    capability = re.sub(r"\s+", " ", capability).strip()
+    capability_terms = " ".join(capability.split()[:8])
+
+    queries: list[str] = []
+    for product in products:
+        queries.extend(
+            [
+                f"{product} official docs {capability_terms}".strip(),
+                f"{product} built-in native feature selected text context menu shortcut",
+                f"{product} command palette keyboard shortcuts selected text",
+                f"{product} extension plugin API custom commands",
+                f"{product} release notes {capability_terms}".strip(),
+            ]
+        )
+    return unique_keep_order(queries, max_queries)
+
+
 def build_query_plan(raw: str, max_queries: int = 12) -> QueryPlan:
     profile = build_need_profile(raw)
+    native_audit_queries = build_native_audit_queries(raw)
     normalized = normalize_text(raw)
     terms = profile.positive_terms
     queries: list[str] = [raw.strip()]
@@ -328,7 +452,12 @@ def build_query_plan(raw: str, max_queries: int = 12) -> QueryPlan:
     if normalized != raw.strip().lower():
         queries.append(normalized)
 
-    return QueryPlan(raw=raw, profile=profile, queries=unique_keep_order(queries, max_queries))
+    return QueryPlan(
+        raw=raw,
+        profile=profile,
+        queries=unique_keep_order(queries, max_queries),
+        native_audit_queries=native_audit_queries,
+    )
 
 
 def request_headers(extra: dict[str, str] | None = None) -> dict[str, str]:
@@ -845,10 +974,11 @@ async def search_pulsemcp(plan: QueryPlan, max_results: int, timeout: float) -> 
 async def search_web(plan: QueryPlan, max_results: int, timeout: float) -> list[Candidate]:
     candidates: dict[str, Candidate] = {}
     brave_key = os.getenv("BRAVE_API_KEY")
+    web_queries = unique_keep_order(plan.native_audit_queries + source_queries(plan, 4), 6)
 
     if brave_key:
         headers = {"X-Subscription-Token": brave_key}
-        for query in source_queries(plan, 4):
+        for query in web_queries:
             params = urllib.parse.urlencode({"q": query, "count": min(max_results, 10)})
             url = f"https://api.search.brave.com/res/v1/web/search?{params}"
             data = await asyncio.to_thread(http_get_json, url, headers=headers, timeout=timeout)
@@ -867,7 +997,7 @@ async def search_web(plan: QueryPlan, max_results: int, timeout: float) -> list[
 
     # Jina search is best effort. It occasionally rejects or times out; that should not fail the run.
     if not candidates:
-        for query in source_queries(plan, 2):
+        for query in web_queries[:2]:
             params = urllib.parse.urlencode({"q": query})
             url = f"https://s.jina.ai/?{params}"
             try:
@@ -1206,6 +1336,14 @@ def print_text_report(plan: QueryPlan, candidates: list[Candidate], limit: int, 
     print()
     print(f"Need: {plan.raw}")
     print()
+    if plan.native_audit_queries:
+        print("Native feature audit:")
+        print("- Before ranking external tools, check whether the target product already solves this.")
+        print("- Inspect: " + "; ".join(NATIVE_FEATURE_CHECKLIST) + ".")
+        print("- Suggested official/native queries:")
+        for query in plan.native_audit_queries:
+            print(f"  - {query}")
+        print()
     print("Query plan:")
     for query in plan.queries:
         print(f"- {query}")
@@ -1280,6 +1418,11 @@ async def async_main(argv: list[str]) -> int:
     if args.json:
         payload = {
             "need": args.need,
+            "native_feature_audit": {
+                "required": bool(plan.native_audit_queries),
+                "checklist": list(NATIVE_FEATURE_CHECKLIST),
+                "queries": plan.native_audit_queries,
+            },
             "queries": plan.queries,
             "sources": sources,
             "candidates": [

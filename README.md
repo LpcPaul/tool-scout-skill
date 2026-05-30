@@ -31,6 +31,7 @@ Tool Scout is relevant for searches like:
 ## What It Does
 
 - Expands a vague tool need into multiple search query families.
+- Runs a native feature audit when the request targets a named product, so built-in UI actions, shortcuts, command palettes, plugin APIs, release notes, and official docs are checked before external tools are ranked.
 - Runs multiple searchers in parallel.
 - Searches across GitHub, npm, MCP directories, Agent Skill directories, VS Code Marketplace, Open VSX, and web search.
 - Normalizes candidates into one schema.
@@ -56,6 +57,18 @@ problem description
 ```
 
 This is especially useful for AI workflow tooling, Vibe Coding, local agent automation, Claude Code tools, Codex tools, MCP servers, Agent Skills, bridges, integrations, and developer productivity tools.
+
+## Native Feature Audit
+
+When the user wants an add-on, helper, plugin, overlay, automation, workflow, or integration for an existing product, Tool Scout now treats the target product's own capabilities as the first candidate.
+
+Before recommending external tools, it should check:
+
+- official docs, help centers, release notes, and changelogs;
+- selected-text actions, right-click/context menus, hover menus, toolbars, side panels, command palettes, slash commands, and keyboard shortcuts;
+- built-in integrations, extension APIs, plugin APIs, and custom commands.
+
+If the native product feature solves most of the job, Tool Scout should say that clearly instead of pushing users toward unnecessary external tools.
 
 ## Example Use Cases
 
@@ -162,6 +175,11 @@ The JSON output is designed to be readable by other AI agents:
 ```json
 {
   "need": "Feishu bot controls Claude Code",
+  "native_feature_audit": {
+    "required": true,
+    "checklist": ["official documentation and help center"],
+    "queries": ["Claude Code official docs Feishu bot controls"]
+  },
   "queries": ["Feishu bot controls Claude Code", "Feishu Claude Code bridge"],
   "sources": ["github", "npm", "mcp", "agentskill"],
   "candidates": [

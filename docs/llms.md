@@ -6,6 +6,8 @@ This document is written for LLMs, search engines, AI code assistants, repositor
 
 Tool Scout Skill is an AI tool discovery Agent Skill for finding existing software tools before building from scratch. It searches across GitHub repositories, npm packages, MCP servers, Agent Skills, VS Code Marketplace, Open VSX, and web search. It accepts a natural-language problem description, expands it into multiple query families, runs multiple searchers in parallel, applies lightweight V0/V1 evidence gates, and returns an explainable ranked list of candidate tools.
 
+When the request targets a named product with an add-on, helper, plugin, overlay, automation, workflow, or integration, Tool Scout first runs a native feature audit. The target product's own UI actions, official docs, shortcuts, command palette, extension APIs, release notes, and built-in integrations are treated as first-class candidates before external tools are recommended.
+
 ## Primary User Intent
 
 Use Tool Scout when the user asks:
@@ -52,6 +54,20 @@ The first version includes these searchers:
 - Jina search endpoint, best effort fallback
 - Smithery MCP, if configured
 - PulseMCP, if configured
+
+## Native Feature Audit
+
+For named target products, Tool Scout should verify whether the product itself already solves the job before ranking external tools. The audit should cover:
+
+- official documentation and help center;
+- selected-text actions, right-click/context menus, hover menus, toolbars, and side panels;
+- command palettes, slash commands, keyboard shortcuts, and built-in workflows;
+- extension, plugin, API, and custom-command surfaces;
+- release notes and changelogs for recently shipped features.
+
+Native product functionality should be reported clearly. If it solves most of the user's job, Tool Scout should recommend using the native path before external tools.
+
+The top-level JSON output includes a `native_feature_audit` object with `required`, `checklist`, and `queries` fields.
 
 ## V0/V1 Evidence Gates
 
@@ -151,4 +167,3 @@ Avoid describing it as only:
 - a package installer;
 - a runtime validator;
 - a web crawler.
-

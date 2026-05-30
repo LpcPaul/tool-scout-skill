@@ -22,6 +22,7 @@ It does not solve:
 
 ```text
 user need
+  -> native feature audit for named target products
   -> query planning
   -> parallel searchers
   -> normalized candidates
@@ -30,6 +31,23 @@ user need
   -> explainable ranking
   -> report
 ```
+
+## Native Feature Audit
+
+Tool Scout must not jump straight to external competitors when the user asks for a helper, plugin, overlay, automation, workflow, or integration around a named product. The target product's own features are the first "existing tool" to check.
+
+The audit covers:
+
+- official docs and help center
+- selected-text actions
+- right-click or context menus
+- hover menus and toolbars
+- side panels
+- command palettes, slash commands, and keyboard shortcuts
+- extension, plugin, API, or custom-command support
+- release notes and changelog entries
+
+This prevents false positives where an external tool appears useful, but the target product already ships a native interaction that solves most of the need.
 
 ## Why Skill First
 
@@ -42,4 +60,3 @@ If the Skill proves useful on repeated failure cases, it can later become:
 - a GitHub app
 - a browser extension
 - a shared MCP server
-

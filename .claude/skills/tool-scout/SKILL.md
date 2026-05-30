@@ -40,20 +40,26 @@ The user does not need to know whether the answer is a Skill, MCP server, Agent,
    - required platform
    - local vs hosted preference
    - free/open-source preference
-3. Generate multiple query families:
+3. If the request is an add-on, helper, plugin, overlay, automation, workflow, or integration for a named product, run a **native feature audit before external competitor search**:
+   - Check official docs, help center, release notes, and changelog.
+   - Inspect or ask the user to inspect the current product UI: selected text actions, right-click/context menu, hover menu, toolbar, side panels, command palette, slash commands, and keyboard shortcuts.
+   - Check whether extension/plugin/API/custom-command support already covers the job.
+   - Treat native capability as a first-class "existing tool"; if it solves 70%+ of the job, say so before recommending external tools.
+   - Do not assume a product lacks a feature just because external search results are stronger.
+4. Generate multiple query families:
    - user wording
    - developer wording
    - capability wording
    - product type wording
    - English and Chinese synonyms where relevant
    - source-specific wording, such as `in:readme`, `MCP server`, `VS Code extension`, `npm package`
-4. Run searchers in parallel.
-5. Normalize and deduplicate candidates.
-6. Apply V0/V1 gates:
+5. Run searchers in parallel.
+6. Normalize and deduplicate candidates.
+7. Apply V0/V1 gates:
    - V0: source exists and is not obviously dead.
    - V1: description, README-level content, metadata, or tool schema shows evidence that it can solve the task.
-7. Rank only candidates that pass V0/V1.
-8. Explain the ranking in plain language.
+8. Rank only candidates that pass V0/V1.
+9. Explain the ranking in plain language, including whether native product functionality already covers the need.
 
 ## Command
 
@@ -139,4 +145,3 @@ I found N credible candidates. Top choices:
 Rejected or lower-confidence results:
 - Name - why it did not pass V1 or why it is less relevant
 ```
-

@@ -12,6 +12,8 @@ CLI: `.claude/skills/tool-scout/scripts/tool_scout.py`
 
 Tool Scout is a cross-source software tool finder for AI agents and Vibe Coding workflows. It searches GitHub repositories, npm packages, MCP server directories, Agent Skill directories, VS Code Marketplace, Open VSX, and web search.
 
+When a request targets a named product with a helper, plugin, overlay, workflow, automation, or integration, Tool Scout should first audit the product's native features: official docs, selected-text actions, right-click/context menus, command palettes, shortcuts, extension APIs, release notes, and built-in integrations.
+
 Use it when a user or AI agent needs to find an existing software tool, MCP server, Agent Skill, GitHub repo, npm package, VS Code extension, Open VSX extension, SaaS product, CLI, bridge, integration, or automation before building one.
 
 ## Key Phrases
@@ -30,6 +32,7 @@ Use it when a user or AI agent needs to find an existing software tool, MCP serv
 ## What It Does
 
 - Expands a user tool need into multiple search query families.
+- Checks native target-product functionality before external alternatives when relevant.
 - Runs multiple searchers in parallel.
 - Normalizes candidates into one schema.
 - Applies lightweight V0/V1 evidence gates.
@@ -58,4 +61,3 @@ Use it when a user or AI agent needs to find an existing software tool, MCP serv
 - [`.claude/skills/tool-scout/scripts/tool_scout.py`](.claude/skills/tool-scout/scripts/tool_scout.py): implementation.
 - [`docs/llms.md`](docs/llms.md): longer LLM ingestion summary.
 - [`docs/design.md`](docs/design.md): design notes.
-
