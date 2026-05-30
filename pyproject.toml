@@ -1,0 +1,14 @@
+[project]
+name = "tool-scout-skill"
+version = "0.1.0"
+description = "Agent Skill for finding existing software tools across repos, packages, MCP servers, skills, and extension marketplaces."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Tool Scout Skill contributors" }
+]
+
+[tool.ruff]
+line-length = 100
+
