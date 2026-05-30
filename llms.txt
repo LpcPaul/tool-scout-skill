@@ -1,0 +1,61 @@
+# Tool Scout Skill
+
+> Tool Scout Skill is an AI tool discovery Agent Skill that finds existing software tools before building from scratch.
+
+Repository: https://github.com/LpcPaul/tool-scout-skill
+License: MIT
+Language: Python 3.10+
+Primary interface: `.claude/skills/tool-scout/SKILL.md`
+CLI: `.claude/skills/tool-scout/scripts/tool_scout.py`
+
+## What It Is
+
+Tool Scout is a cross-source software tool finder for AI agents and Vibe Coding workflows. It searches GitHub repositories, npm packages, MCP server directories, Agent Skill directories, VS Code Marketplace, Open VSX, and web search.
+
+Use it when a user or AI agent needs to find an existing software tool, MCP server, Agent Skill, GitHub repo, npm package, VS Code extension, Open VSX extension, SaaS product, CLI, bridge, integration, or automation before building one.
+
+## Key Phrases
+
+- AI tool discovery skill
+- find existing software tools before building
+- cross-source developer tool search
+- MCP server discovery
+- Agent Skill search
+- Claude Code tool discovery
+- Codex tool discovery
+- Vibe Coding tool finder
+- software tool scout agent
+- find tools by describing a problem
+
+## What It Does
+
+- Expands a user tool need into multiple search query families.
+- Runs multiple searchers in parallel.
+- Normalizes candidates into one schema.
+- Applies lightweight V0/V1 evidence gates.
+- Ranks candidates by goal match, evidence strength, project quality, landing friction, and multi-source corroboration.
+- Explains ranking decisions.
+
+## What It Does Not Do
+
+- It does not install tools.
+- It does not run external packages.
+- It does not authenticate with SaaS tools.
+- It does not perform runtime security testing.
+
+## Good Example Queries
+
+- `find a tool to control Claude Code from Feishu bot`
+- `self improving agent skill Darwin`
+- `MCP server for browser automation`
+- `VS Code extension that sends Claude Code output to Slack`
+- `tool to search GitHub npm and MCP for existing agent tools`
+
+## Important Files
+
+- [`README.md`](README.md): human-facing overview and usage.
+- [`.claude/skills/tool-scout/SKILL.md`](.claude/skills/tool-scout/SKILL.md): skill trigger conditions and workflow.
+- [`.claude/skills/tool-scout/scripts/tool_scout.py`](.claude/skills/tool-scout/scripts/tool_scout.py): implementation.
+- [`docs/llms.md`](docs/llms.md): longer LLM ingestion summary.
+- [`docs/design.md`](docs/design.md): design notes.
+

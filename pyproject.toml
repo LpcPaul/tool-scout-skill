@@ -8,7 +8,25 @@ license = { text = "MIT" }
 authors = [
   { name = "Tool Scout Skill contributors" }
 ]
+keywords = [
+  "tool-discovery",
+  "agent-skill",
+  "mcp",
+  "mcp-server",
+  "claude-code",
+  "codex",
+  "vibe-coding",
+  "github-search",
+  "npm-search",
+  "vscode-extension",
+  "open-vsx",
+  "ai-tools"
+]
+
+[project.urls]
+Homepage = "https://github.com/LpcPaul/tool-scout-skill"
+Repository = "https://github.com/LpcPaul/tool-scout-skill"
+Issues = "https://github.com/LpcPaul/tool-scout-skill/issues"
 
 [tool.ruff]
 line-length = 100
-
